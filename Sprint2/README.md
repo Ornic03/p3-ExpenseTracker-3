@@ -63,4 +63,10 @@ Auditoría ejecutada sobre la versión publicada, en modo Mobile.
 | Íconos | Ionicons de `@expo/vector-icons` | Caracteres Unicode |
 | Identidad de la app | `app.json` (nombre, ícono) | `manifest.json` más metaetiquetas para iOS |
 | Uso sin conexión | La app se ejecuta de forma local | Requiere un Service Worker (`vite-plugin-pwa`) que guarda los archivos en caché |
-| Datos de gastos | Los gastos nuevos se guardan en memoria, en el estado de la app | Se usan datos de ejemplo (`mockExpenses.js`); el sprint no pedía guardar |
+| Datos de gastos (Sprint 3, US #1) | `ExpensesProvider` mantiene gastos en memoria | `ExpensesProvider` mantiene gastos en memoria; ambos usan `useExpenses()` |
+
+## Sprint 3 — US #1: Context de gastos
+
+Las pantallas Inicio, Gastos y Detalle leen `useExpenses()` y el formulario agrega gastos en el Context. El detalle permite eliminarlos. Los tres gastos iniciales se centralizaron en `src/data/initialExpenses.js`; la demo separada de 800 gastos del Sprint 2 sigue disponible.
+
+**Importante:** en esta US los gastos están solamente en memoria: al recargar la PWA vuelven los datos de ejemplo. El almacenamiento local y Firestore se incorporarán en las siguientes US. Revisá [`PERSISTENCIA.md`](PERSISTENCIA.md) para el estado actual y las pruebas sugeridas.

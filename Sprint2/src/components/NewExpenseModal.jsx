@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import '../styles/NewExpenseModal.css'
-
-const CATEGORIAS = ['Comida', 'Transporte', 'Servicios', 'Otros']
+import { CATEGORIES } from '../data/categories'
+import { useExpenses } from '../hooks/useExpenses'
 
 // Migrado de FormularioNuevoGasto.js (Proyecto1): en web usamos
 // <dialog> + showModal(), inputs HTML y botones accesibles.
 export default function NewExpenseModal({ onClose }) {
+  const { addExpense } = useExpenses()
   const dialogRef = useRef(null)
   const [nombre, setNombre] = useState('')
   const [monto, setMonto] = useState('')
@@ -57,18 +58,20 @@ export default function NewExpenseModal({ onClose }) {
       return
     }
 
-    const datos = {
-      nombre: nombre.trim(),
+    const gasto = addExpense({
+      descripcion: nombre.trim(),
       monto: montoNumero,
       categoria,
-    }
-
-    // Esta US no guarda gastos ni modifica el resumen/listado.
-    console.info('[ExpenseTracker] Formulario de prueba:', datos)
-    setMensaje({
-      tipo: 'exito',
-      texto: 'Formulario completado. Esto es una demostración: todavía no se guardan gastos.',
     })
+    if (gasto) {
+      setNombre('')
+      setMonto('')
+      setCategoria('Comida')
+      setMensaje({
+        tipo: 'exito',
+        texto: 'Gasto agregado. Por ahora se guarda solo en memoria (US #1).',
+      })
+    }
   }
 
   const onClickDialog = (event) => {
@@ -146,7 +149,7 @@ export default function NewExpenseModal({ onClose }) {
           <fieldset className="new-expense-modal__categories">
             <legend>Categoría</legend>
             <div className="new-expense-modal__chips">
-              {CATEGORIAS.map((opcion) => (
+              {CATEGORIES.map((opcion) => (
                 <button
                   type="button"
                   key={opcion}

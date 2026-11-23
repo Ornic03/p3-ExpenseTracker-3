@@ -2,16 +2,12 @@ import { FlatList, Pressable, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Encabezado from '../components/Encabezado';
 import { RUTAS } from '../navigation/rutas';
+import { useExpenses } from '../hooks/useExpenses';
 
-// User Story #5: gastos de ejemplo que se mantienen en la demostración.
-const gastosDeEjemplo = [
-  { id: '1', descripcion: 'Supermercado', monto: 25000 },
-  { id: '2', descripcion: 'Combustible', monto: 18000 },
-  { id: '3', descripcion: 'Internet', monto: 32000 },
-];
-
+// La lista toma los gastos del Context compartido (US #1).
 // User Story #6: esta pantalla se muestra a través del TabNavigator.
 export default function PantallaGastos({ navigation }) {
+  const { expenses, isLoaded } = useExpenses();
   return (
     <SafeAreaView edges={['top']} style={styles.contenedor}>
       <Encabezado
@@ -20,13 +16,14 @@ export default function PantallaGastos({ navigation }) {
       />
 
       <FlatList
-        data={gastosDeEjemplo}
+        data={expenses}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.lista}
+        ListEmptyComponent={<Text>{isLoaded ? 'Todavía no hay gastos registrados.' : 'Cargando gastos…'}</Text>}
         renderItem={({ item }) => (
           <Pressable
             style={styles.tarjetaGasto}
-            onPress={() => navigation.navigate(RUTAS.DETALLE_GASTO, { gasto: item })}
+            onPress={() => navigation.navigate(RUTAS.DETALLE_GASTO, { id: item.id })}
           >
             <Text style={styles.nombreGasto}>{item.descripcion}</Text>
             <Text style={styles.montoGasto}>

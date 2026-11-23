@@ -3,9 +3,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Encabezado from '../components/Encabezado';
 import Boton from '../components/Boton';
 import { RUTAS } from '../navigation/rutas';
+import { useExpenses } from '../hooks/useExpenses';
 
 // Pantalla de bienvenida: ahora es una pantalla real del TabNavigator.
 export default function PantallaInicio({ navigation }) {
+  const { expenses } = useExpenses();
+  const total = expenses.reduce((suma, gasto) => suma + Number(gasto.monto || 0), 0);
+
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
       <View style={styles.card}>
@@ -14,6 +18,11 @@ export default function PantallaInicio({ navigation }) {
           titulo="¡Bienvenido/a!"
           descripcion="Una forma sencilla de registrar y organizar tus gastos diarios."
         />
+
+        <View style={styles.resumen}>
+          <Text style={styles.textoResumen}>Total registrado: ${total.toLocaleString('es-AR')}</Text>
+          <Text style={styles.textoResumen}>Movimientos: {expenses.length}</Text>
+        </View>
 
         {/* La acción se envía al StackNavigator que contiene las pestañas. */}
         <Boton
@@ -57,4 +66,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   separacion: { marginTop: 12 },
+  resumen: { marginBottom: 20, alignItems: 'center' },
+  textoResumen: { fontSize: 14, color: '#374151', marginBottom: 4 },
 });

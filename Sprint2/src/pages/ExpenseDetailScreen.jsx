@@ -1,9 +1,10 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import CategoryBadge from '../components/CategoryBadge'
 import AppIcon from '../components/AppIcon'
-import mockExpenses from '../data/mockExpenses'
+import { useExpenses } from '../hooks/useExpenses'
 import { buscarGastoSimulado } from '../data/demoExpenses'
 import '../styles/ExpenseDetailScreen.css'
+import '../styles/US1Delete.css'
 
 const moneda = new Intl.NumberFormat('es-AR', {
   style: 'currency', currency: 'ARS', maximumFractionDigits: 0,
@@ -23,7 +24,16 @@ function formatearFecha(fecha) {
 export default function ExpenseDetailScreen() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const gasto = mockExpenses.find((item) => String(item.id) === id) ?? buscarGastoSimulado(id)
+  const { expenses, removeExpense } = useExpenses()
+  const gastoGuardado = expenses.find((item) => String(item.id) === id)
+  // El listado de 800 gastos sigue siendo una demostración separada del Context.
+  const gasto = gastoGuardado ?? buscarGastoSimulado(id)
+
+  const eliminarGasto = () => {
+    if (!gastoGuardado || !window.confirm('¿Querés eliminar este gasto?')) return
+    removeExpense(id)
+    navigate('/expenses', { replace: true })
+  }
 
   const volver = () => {
     // Si se llegó navegando dentro de la app, respetamos el historial.
@@ -62,6 +72,11 @@ export default function ExpenseDetailScreen() {
               <div className="expense-detail__field"><dt>Fecha</dt><dd>{formatearFecha(gasto.fecha)}</dd></div>
               <div className="expense-detail__field expense-detail__field--notes"><dt>Notas</dt><dd>{gasto.notas || 'Sin notas adicionales.'}</dd></div>
             </dl>
+            {gastoGuardado && (
+              <button type="button" className="expense-detail__delete" onClick={eliminarGasto}>
+                Eliminar gasto
+              </button>
+            )}
           </section>
         ) : (
           <section className="expense-detail__card expense-detail__missing" role="status">

@@ -2,7 +2,7 @@ import { lazy, Suspense, useMemo, useState } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import Boton from '../components/Boton'
 import ExpenseCard from '../components/ExpenseCard'
-import mockExpenses from '../data/mockExpenses'
+import { useExpenses } from '../hooks/useExpenses'
 import { demoExpenses } from '../data/demoExpenses'
 import '../styles/ExpensesScreen.css'
 
@@ -17,10 +17,11 @@ const VirtualExpenseList = lazy(() => import('../components/VirtualExpenseList')
 export default function ExpensesScreen() {
   const navigate = useNavigate();
   const { openNewExpenseModal } = useOutletContext();
+  const { expenses, isLoaded } = useExpenses();
   const [metodo, setMetodo] = useState('map');
   const [muestra, setMuestra] = useState('real');
 
-  const gastos = muestra === 'demo' ? demoExpenses : mockExpenses;
+  const gastos = muestra === 'demo' ? demoExpenses : expenses;
   const total = useMemo(() => gastos.reduce((suma, gasto) => suma + Number(gasto.monto || 0), 0), [gastos]);
 
   return (
@@ -37,7 +38,7 @@ export default function ExpensesScreen() {
             <div className="expenses-bonus__options">
               <button type="button" aria-pressed={muestra === 'real'}
                 className={muestra === 'real' ? 'selected' : ''}
-                onClick={() => setMuestra('real')}>3 gastos de ejemplo
+                onClick={() => setMuestra('real')}>Gastos actuales
               </button>
               <button type="button" aria-pressed={muestra === 'demo'}
                 className={muestra === 'demo' ? 'selected' : ''}
@@ -67,7 +68,7 @@ export default function ExpensesScreen() {
         </div>
 
         {gastos.length === 0 ? (
-          <p className="expenses-screen__empty">Todavía no hay gastos registrados.</p>
+          <p className="expenses-screen__empty">{isLoaded ? 'Todavía no hay gastos registrados.' : 'Cargando gastos…'}</p>
         ) : metodo === 'virtual' ? (
           <Suspense fallback={<p role="status">Preparando listado virtualizado…</p>}>
             <VirtualExpenseList key={muestra} gastos={gastos} />

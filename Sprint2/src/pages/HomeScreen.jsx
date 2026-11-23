@@ -1,19 +1,19 @@
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import Boton from '../components/Boton'
-import mockExpenses from '../data/mockExpenses'
+import { useExpenses } from '../hooks/useExpenses'
 import '../styles/HomeScreen.css'
 
 export default function HomeScreen() {
   const navigate = useNavigate()
   const { openNewExpenseModal } = useOutletContext()
 
-  // Se mantiene el resumen original, sin guardar datos todavía.
-  const totalRegistrado = mockExpenses.reduce(
+  const { expenses } = useExpenses()
+  const totalRegistrado = expenses.reduce(
     (total, gasto) => total + Number(gasto.monto || 0),
     0
   )
 
-  const cantidadMovimientos = mockExpenses.length
+  const cantidadMovimientos = expenses.length
 
   const totalFormateado = new Intl.NumberFormat('es-AR', {
     style: 'currency',

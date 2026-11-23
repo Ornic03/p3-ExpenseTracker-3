@@ -27,3 +27,9 @@ Escanear el QR con Expo Go.
 
 ### Ajustes
 ![Ajustes](capturas/ajustes.jpeg)
+
+## Sprint 3 — US #1: Context de gastos
+
+`ExpensesProvider` centraliza los gastos en memoria. Inicio y Listado comparten el estado, el Formulario agrega gastos y el Detalle consulta/elimina desde el Context. Todos acceden mediante `useExpenses()`.
+
+**Importante:** todavía no se usa AsyncStorage ni Firestore: los gastos nuevos se pierden al reiniciar la aplicación, tal como se espera en la US #1. Más detalles en [`PERSISTENCIA.md`](PERSISTENCIA.md).

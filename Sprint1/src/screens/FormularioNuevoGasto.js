@@ -2,22 +2,32 @@ import { useState } from 'react';
 import { Alert, StyleSheet, Text, TextInput, View, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Encabezado from '../components/Encabezado';
+import { CATEGORIES } from '../data/categories';
+import { useExpenses } from '../hooks/useExpenses';
 
 // El StackNavigator proporciona el objeto navigation directamente.
 export default function FormularioNuevoGasto({ navigation }) {
+  const { addExpense } = useExpenses();
   const [nombre, setNombre] = useState('');
   const [monto, setMonto] = useState('');
   const [categoria, setCategoria] = useState('Comida');
 
   const guardarGasto = () => {
-    // Se mantiene la validación y el aviso que ya existían en el formulario.
     if (!nombre.trim() || !monto.trim()) {
       Alert.alert('Campos incompletos', 'Ingresá el nombre y el monto del gasto.');
       return;
     }
-    Alert.alert('Formulario completado', `Gasto: ${nombre}
-Monto: $${monto}
-Categoría: ${categoria}`);
+    const montoNumero = Number(monto.trim().replace(',', '.'));
+    if (!Number.isFinite(montoNumero) || montoNumero <= 0) {
+      Alert.alert('Monto inválido', 'Ingresá un monto mayor a cero.');
+      return;
+    }
+    const gasto = addExpense({ descripcion: nombre.trim(), monto: montoNumero, categoria });
+    if (gasto) {
+      Alert.alert('Gasto registrado', 'El gasto se agregó en memoria.', [
+        { text: 'Aceptar', onPress: () => navigation.goBack() },
+      ]);
+    }
   };
 
   return (
@@ -43,7 +53,7 @@ Categoría: ${categoria}`);
 
       <Text style={styles.etiqueta}>Categoría</Text>
       <View style={styles.categorias}>
-        {['Comida', 'Transporte', 'Servicios', 'Otros'].map((opcion) => (
+        {CATEGORIES.map((opcion) => (
           <Pressable
             key={opcion}
             style={[
