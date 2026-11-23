@@ -123,6 +123,14 @@
   overflow-wrap: anywhere;
 }
 
+/* US #2: estado vacío del resumen, sin cambiar el diseño original. */
+.home-empty-state {
+  margin: 16px 0 0;
+  color: #6B7280;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 /* Accesos rápidos */
 .home-actions {
   display: flex;

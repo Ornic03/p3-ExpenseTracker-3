@@ -5,7 +5,7 @@ import { useExpenses } from '../hooks/useExpenses';
 // El detalle recibe solo el ID: el gasto siempre se consulta desde el Context.
 export default function PantallaDetalleGasto({ route, navigation }) {
   const { expenses, removeExpense } = useExpenses();
-  const id = route.params?.id ?? route.params?.gasto?.id;
+  const id = route.params?.id;
   const gasto = expenses.find((item) => String(item.id) === String(id));
 
   const confirmarEliminacion = () => {

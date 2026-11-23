@@ -7,7 +7,7 @@ export default function HomeScreen() {
   const navigate = useNavigate()
   const { openNewExpenseModal } = useOutletContext()
 
-  const { expenses } = useExpenses()
+  const { expenses, isLoaded } = useExpenses()
   const totalRegistrado = expenses.reduce(
     (total, gasto) => total + Number(gasto.monto || 0),
     0
@@ -52,6 +52,9 @@ export default function HomeScreen() {
               <p className="home-stat-value">{cantidadMovimientos}</p>
             </article>
           </div>
+          {isLoaded && cantidadMovimientos === 0 && (
+            <p className="home-empty-state" role="status">Todavía no registraste gastos.</p>
+          )}
         </section>
 
         <section className="home-card home-shortcuts">

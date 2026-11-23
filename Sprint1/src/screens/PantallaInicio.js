@@ -7,7 +7,7 @@ import { useExpenses } from '../hooks/useExpenses';
 
 // Pantalla de bienvenida: ahora es una pantalla real del TabNavigator.
 export default function PantallaInicio({ navigation }) {
-  const { expenses } = useExpenses();
+  const { expenses, isLoaded } = useExpenses();
   const total = expenses.reduce((suma, gasto) => suma + Number(gasto.monto || 0), 0);
 
   return (
@@ -22,6 +22,9 @@ export default function PantallaInicio({ navigation }) {
         <View style={styles.resumen}>
           <Text style={styles.textoResumen}>Total registrado: ${total.toLocaleString('es-AR')}</Text>
           <Text style={styles.textoResumen}>Movimientos: {expenses.length}</Text>
+          {isLoaded && expenses.length === 0 && (
+            <Text style={styles.mensajeVacio}>Todavía no registraste gastos.</Text>
+          )}
         </View>
 
         {/* La acción se envía al StackNavigator que contiene las pestañas. */}
@@ -68,4 +71,5 @@ const styles = StyleSheet.create({
   separacion: { marginTop: 12 },
   resumen: { marginBottom: 20, alignItems: 'center' },
   textoResumen: { fontSize: 14, color: '#374151', marginBottom: 4 },
+  mensajeVacio: { fontSize: 14, color: '#6B7280', textAlign: 'center', marginTop: 12 },
 });
