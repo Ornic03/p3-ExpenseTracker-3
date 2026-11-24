@@ -1,4 +1,4 @@
-// Datos iniciales de ejemplo. En la US #1 solo se cargan en memoria.
+// Datos iniciales de ejemplo. En la US #3 se usan solo si no existe una clave guardada.
 // El mismo modelo se usa en React Native y en la PWA.
 export const INITIAL_EXPENSES = [
   {

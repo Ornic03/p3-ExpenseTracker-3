@@ -1,4 +1,7 @@
-import { createContext, useCallback, useMemo, useState } from 'react';
+import { createContext, useCallback, useMemo, useState, useEffect, useRef } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { EXPENSES_KEY } from '../storage/keys';
 import { INITIAL_EXPENSES } from '../data/initialExpenses';
 
 export const ExpensesContext = createContext(null);
@@ -11,12 +14,50 @@ function fechaLocal() {
   return `${anio}-${mes}-${dia}`;
 }
 
-// US #1: fuente única de datos de gastos, todavía SIN persistencia.
+// US #3: la interfaz sigue usando el mismo Context de US #1 y US #2.
 export function ExpensesProvider({ children }) {
-  const [expenses, setExpenses] = useState(() => INITIAL_EXPENSES.map((gasto) => ({ ...gasto })));
-  // US #1 no hidrata datos: están disponibles inmediatamente en memoria.
-  // Las US #3 y #4 reemplazarán esto por la carga inicial correspondiente.
-  const [isLoaded] = useState(true);
+  const [expenses, setExpenses] = useState([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const canPersist = useRef(false);
+  const pendingWrite = useRef(Promise.resolve());
+
+  // Hidratación: nunca se guarda el estado inicial antes de terminar la lectura.
+  useEffect(() => {
+    let active = true;
+    async function hydrate() {
+      try {
+        const raw = await AsyncStorage.getItem(EXPENSES_KEY);
+        const loaded = raw === null
+          ? INITIAL_EXPENSES.map((gasto) => ({ ...gasto }))
+          : JSON.parse(raw);
+        if (!Array.isArray(loaded)) throw new Error('Los gastos guardados no son un arreglo');
+        if (active) {
+          setExpenses(loaded); // Un arreglo [] guardado es válido: no se repueblan los ejemplos.
+          canPersist.current = true;
+        }
+      } catch (error) {
+        // Si falla la lectura, no sobrescribir posibles datos existentes.
+        console.warn('No se pudieron cargar los gastos:', error);
+      } finally {
+        if (active) setIsLoaded(true);
+      }
+    }
+    hydrate();
+    return () => { active = false; };
+  }, []);
+
+  // Persistencia: serializar escrituras para mantener el orden de los cambios.
+  useEffect(() => {
+    if (!isLoaded || !canPersist.current) return;
+    async function persist() {
+      try {
+        await AsyncStorage.setItem(EXPENSES_KEY, JSON.stringify(expenses));
+      } catch (error) {
+        console.warn('No se pudieron guardar los gastos:', error);
+      }
+    }
+    pendingWrite.current = pendingWrite.current.then(persist);
+  }, [expenses, isLoaded]);
 
   const addExpense = useCallback((data) => {
     const descripcion = String(data.descripcion ?? data.nombre ?? '').trim();
@@ -44,5 +85,19 @@ export function ExpensesProvider({ children }) {
     [expenses, isLoaded, addExpense, removeExpense]
   );
 
+  if (!isLoaded) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#2563EB" />
+        <Text style={styles.loadingText}>Cargando gastos…</Text>
+      </View>
+    );
+  }
+
   return <ExpensesContext.Provider value={value}>{children}</ExpensesContext.Provider>;
 }
+
+const styles = StyleSheet.create({
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F3F4F6' },
+  loadingText: { marginTop: 12, color: '#4B5563' },
+});

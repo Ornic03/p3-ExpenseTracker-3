@@ -24,7 +24,7 @@ export default function FormularioNuevoGasto({ navigation }) {
     }
     const gasto = addExpense({ descripcion: nombre.trim(), monto: montoNumero, categoria });
     if (gasto) {
-      Alert.alert('Gasto registrado', 'El gasto se agregó en memoria.', [
+      Alert.alert('Gasto registrado', 'El gasto se agregó correctamente.', [
         { text: 'Aceptar', onPress: () => navigation.goBack() },
       ]);
     }
