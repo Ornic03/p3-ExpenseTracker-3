@@ -69,7 +69,7 @@ export default function NewExpenseModal({ onClose }) {
       setCategoria('Comida')
       setMensaje({
         tipo: 'exito',
-        texto: 'Gasto registrado. Por ahora se guarda solo en memoria.',
+        texto: 'Gasto registrado correctamente.',
       })
     }
   }

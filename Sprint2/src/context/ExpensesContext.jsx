@@ -1,5 +1,6 @@
-import { createContext, useCallback, useMemo, useState } from 'react';
-import { INITIAL_EXPENSES } from '../data/initialExpenses';
+import { createContext, useCallback, useMemo, useState, useEffect } from 'react';
+import { EXPENSES_KEY } from '../storage/keys';
+import { leerGastos, guardarJSON } from '../storage/localPersistence';
 
 export const ExpensesContext = createContext(null);
 
@@ -11,12 +12,16 @@ function fechaLocal() {
   return `${anio}-${mes}-${dia}`;
 }
 
-// US #1: fuente única de datos de gastos, todavía SIN persistencia.
+// US #4: hidratación síncrona, sin cambiar la API de US #1 y US #2.
 export function ExpensesProvider({ children }) {
-  const [expenses, setExpenses] = useState(() => INITIAL_EXPENSES.map((gasto) => ({ ...gasto })));
-  // US #1 no hidrata datos: están disponibles inmediatamente en memoria.
-  // Las US #3 y #4 reemplazarán esto por la carga inicial correspondiente.
-  const [isLoaded] = useState(true);
+  const [expenses, setExpenses] = useState(() => leerGastos());
+  // La lectura terminó durante la inicialización de useState.
+  const isLoaded = true;
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    guardarJSON(EXPENSES_KEY, expenses);
+  }, [expenses, isLoaded]);
 
   const addExpense = useCallback((data) => {
     const descripcion = String(data.descripcion ?? data.nombre ?? '').trim();

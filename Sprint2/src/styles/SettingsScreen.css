@@ -28,3 +28,67 @@
   font-size: 16px;
   line-height: 1.5;
 }
+.settings-screen__card {
+  box-sizing: border-box;
+  max-width: 480px;
+  margin: 24px auto 0;
+  padding: 0 18px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 8%);
+}
+
+.settings-screen__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 56px;
+  color: #374151;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.settings-screen__row + .settings-screen__row {
+  border-top: 1px solid #E5E7EB;
+}
+
+.settings-screen__switch {
+  appearance: none;
+  box-sizing: border-box;
+  position: relative;
+  width: 46px;
+  height: 28px;
+  margin: 0;
+  flex: 0 0 46px;
+  background: #D1D5DB;
+  border: 1px solid #9CA3AF;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.settings-screen__switch::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 3px;
+  left: 3px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.settings-screen__switch:checked {
+  background: #2563EB;
+  border-color: #2563EB;
+}
+
+.settings-screen__switch:checked::before {
+  left: 21px;
+}
+
+.settings-screen__switch:focus-visible {
+  outline: 3px solid #93C5FD;
+  outline-offset: 3px;
+}
